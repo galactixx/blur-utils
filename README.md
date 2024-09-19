@@ -1,2 +1,2 @@
-# blur-utils
-Tiny package containing helpful functions when blurring images
+# face-blur-utils
+Tiny package containing helpful classes and functions when blurring faces
