@@ -1,4 +1,4 @@
-from blur_utils._blur import (
+from face_blur_utils._blur import (
     AverageBlur,
     BilateralFilter,
     BoxFilter,

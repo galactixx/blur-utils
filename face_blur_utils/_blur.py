@@ -13,8 +13,8 @@ from typing import (
 import numpy as np
 from pydantic import BaseModel
 
-from blur_utils._typing import BlurSetting, DetectedBBox
-from blur_utils._settings import (
+from face_blur_utils._typing import BlurSetting, DetectedBBox
+from face_blur_utils._settings import (
     AverageBlurSettings,
     BilateralFilterSettings,
     BoxFilterSettings,

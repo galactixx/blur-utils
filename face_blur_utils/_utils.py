@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 from PIL import Image
 
-from blur_utils._typing import ImageFile
+from face_blur_utils._typing import ImageFile
 
 def convert_BGR(image_array: NDArray[Any]) -> MatLike:
     """"""

@@ -13,7 +13,7 @@ from typing import (
 from PIL import Image
 from numpy.typing import NDArray
 
-from blur_utils._settings import (
+from face_blur_utils._settings import (
     AverageBlurSettings,
     GaussianBlurSettings,
     MedianBlurSettings
