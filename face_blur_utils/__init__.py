@@ -4,9 +4,29 @@ from face_blur_utils._blur import (
     BoxFilter,
     GaussianBlur,
     MedianBlur,
-    MosaicRectangleBlur,
+    MosaicRectBlur,
     MotionBlur
 )
+from face_blur_utils._settings import (
+    AverageBlurSettings,
+    GaussianBlurSettings,
+    MedianBlurSettings,
+    BilateralFilterSettings,
+    BoxFilterSettings,
+    MotionBlurSettings
+)
+from face_blur_utils._utils import (
+    load_image,
+    load_video
+)
+from face_blur_utils._typing import (
+    BlurSetting,
+    DetectedBBox,
+    ImageFile,
+    VideoFile,
+    VideoOutput
+)
+from face_blur_utils._exceptions import VideoCaptureError
 
 __version__ = '0.1.0'
 __all__ = [
@@ -15,6 +35,20 @@ __all__ = [
     'BoxFilter',
     'GaussianBlur',
     'MedianBlur',
-    'MosaicRectangleBlur',
-    'MotionBlur'
+    'MosaicRectBlur',
+    'MotionBlur',
+    'AverageBlurSettings',
+    'GaussianBlurSettings',
+    'MedianBlurSettings',
+    'BilateralFilterSettings',
+    'BoxFilterSettings',
+    'MotionBlurSettings',
+    'load_image',
+    'load_video',
+    'BlurSetting',
+    'DetectedBBox',
+    'ImageFile',
+    'VideoFile',
+    'VideoOutput',
+    'VideoCaptureError'
 ]

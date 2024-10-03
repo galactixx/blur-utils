@@ -108,7 +108,7 @@ class MotionBlur(AbstractBlur):
         return cv2.filter2D(image, **self.settings)
 
 
-class MosaicRectangleBlur(AbstractBlur):
+class MosaicRectBlur(AbstractBlur):
     """"""
     def __init__(
         self,

@@ -11,6 +11,6 @@ class BaseError(Exception):
 
 
 class VideoCaptureError(BaseError):
-    """"""
+    """Error occurs when loading a video file into a cv2.VideoCapture."""
     def __init__(self, message: str):
         super().__init__(message=message)
