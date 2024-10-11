@@ -16,6 +16,8 @@ from face_blur_utils._settings import (
     MotionBlurSettings
 )
 from face_blur_utils._utils import (
+    convert_BGR,
+    convert_RGB,
     load_image,
     load_video
 )
@@ -43,6 +45,8 @@ __all__ = [
     'BilateralFilterSettings',
     'BoxFilterSettings',
     'MotionBlurSettings',
+    'convert_BGR',
+    'convert_RGB',
     'load_image',
     'load_video',
     'BlurSetting',

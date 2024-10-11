@@ -25,7 +25,7 @@ from face_blur_utils._settings import (
 
 class AbstractBlur(ABC):
     """
-    A  simple abstract class for a variety of facial blur methods. 
+    A simple abstract class for a variety of facial blur methods. 
     
     Args:
         image (`MatLike`): A `MatLike` instance, an ndarray representation of the image.
@@ -63,7 +63,7 @@ class AbstractBlur(ABC):
         image_roi = self.image[y: y+h, x: x+w]
     
         roi_blurred = self.apply_blur(image=image_roi)
-        self.image[y: y+h, x: x+w] = roi_blurred
+        image_roi[:, :] = roi_blurred
 
 
 class BilateralFilter(AbstractBlur):
@@ -244,10 +244,12 @@ class MosaicRectBlur(AbstractBlur):
         super().__init__(image=image)
         self.num_x_tesserae = num_x_tesserae
         self.num_y_tesserae = num_y_tesserae
+
+        # Select blur method to apply to each tessera
         self._blur_method = self._select_blur_method(blur_method=blur_method)
 
     def _select_blur_method(self, blur_method: Optional[BlurSetting]) -> AbstractBlur:
-        """A private method to select the blur method to use within each tesserae."""
+        """A private method to select the blur method to use within tessera."""
         class Pixelation(AbstractBlur):
             """"""
             def __init__(self, image: MatLike):
@@ -311,10 +313,9 @@ class MosaicRectBlur(AbstractBlur):
                 block = (y_start, x_start, y_end, x_end)
                 blocks.append(block)
 
-        # Iterate through each pre-generated tesserae and apply the blur
+        # Iterate through each pre-computed tesserae and apply the blur
         for (y_start, x_start, y_end, x_end) in blocks:
-            image[y_start: y_end, x_start: x_end] = self._blur_method.apply_blur(
-                image=image[y_start: y_end, x_start: x_end]
-            )
+            tessera_view = image[y_start: y_end, x_start: x_end]
+            tessera_view[:, :] = self._blur_method.apply_blur(image=tessera_view)
 
         return image

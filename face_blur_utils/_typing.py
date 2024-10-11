@@ -44,13 +44,12 @@ BlurSetting: TypeAlias = Union[
 @dataclass
 class DetectedBBox:
     """
-    Represents a bounding box detected in an image, defined
-    by its left, top, right, and bottom coordinates.
+    Represents a bounding box detected in an image, defined by its
+    left, top, right, and bottom coordinates.
 
-    This class provides utility methods for creating a bounding
-    box  from (x, y) coordinates and width/height, and it also
-    offers properties to access the width, height, and the
-    (x, y, w, h) format.
+    This class provides utility methods for creating a bounding box 
+    from (x, y) coordinates and width/height, and it also offers properties
+    to access the width, height, and the (x, y, w, h) format.
 
     Args:
         left (int): The minimum x coordinate of thebounding box.
@@ -72,9 +71,8 @@ class DetectedBBox:
         h: int
     ) -> DetectedBBox:
         """
-        Create an instance of DetectedBBox from the minimum x and
-        y coordinates of the bounding box, as well as the width and
-        height.
+        Create an instance of `DetectedBBox` from the minimum x and y coordinates 
+        of the bounding box, as well as the width and height.
 
         Args:
             x (int): The minimum x coordinate.
@@ -83,7 +81,7 @@ class DetectedBBox:
             h (int): The height of the bounding box.
 
         Returns:
-            DetectedBBox: A DetectedBBox instance.
+            `DetectedBBox`: A `DetectedBBox` instance.
         """
         right = x + w
         bottom = y + h
@@ -111,7 +109,7 @@ class VideoOutput:
     Simple dataclass to store metadata from video output.
 
     Args:
-        video_path (Path): A Path instance representing the video path.
+        video_path (`Path`): A `Path` instance representing the video path.
         frames (int): The number of frames in the video.
         fps (int): The frames-per-second of the video.
     """
@@ -121,7 +119,7 @@ class VideoOutput:
 
     @property
     def load_video(self) -> cv2.VideoCapture:
-        """Loads video and returns a cv2.VideoCapture instance."""
+        """Loads video and returns a `cv2.VideoCapture` instance."""
         return load_video(video_file=self.video_path)
     
     def display_video(self) -> None:
