@@ -25,13 +25,13 @@ NOT_A_VIDEO = 'not_a_video.mp4'
     'image_file_name', [ELON_MUSK_PHOTO, MARK_Z_PHOTO]
 )
 def test_load_image(image_file_name: str) -> None:
-    """"""
+    """Test loading of valid images."""
     image_file_path = os.path.join(EXAMPLES_PATH, image_file_name)
     _ = load_image(image_file=image_file_path)
 
 
 def test_load_invalid_image() -> None:
-    """"""
+    """Test loading of invalid images with non-existent path."""
     image_file_path = os.path.join(EXAMPLES_PATH, NOT_A_PHOTO)
 
     with pytest.raises(FileNotFoundError) as exc_info:
@@ -41,13 +41,13 @@ def test_load_invalid_image() -> None:
 
 
 def test_load_video() -> None:
-    """"""
+    """Test loading of valid videos."""
     video_file_path = os.path.join(EXAMPLES_PATH, STOCK_VIDEO)
     _ = load_video(video_file=video_file_path)
 
 
 def test_load_invalid_video() -> None:
-    """"""
+    """Test loading of invalid videos with non-existent path."""
     video_file_path = os.path.join(EXAMPLES_PATH, NOT_A_VIDEO)
 
     with pytest.raises(FileNotFoundError) as exc_info:

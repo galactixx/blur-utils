@@ -6,7 +6,7 @@ from face_blur_utils import DetectedBBox
 
 @dataclass(frozen=True)
 class BBoxTestCase:
-    """"""
+    """Used in testing the `DetectedBBox` class."""
     bbox: Tuple[int, int, int, int]
     x_y_w_h: Tuple[int, int, int, int]
     width: int
@@ -20,7 +20,7 @@ BOUNDING_BOXES: List[BBoxTestCase] = [
 
 @pytest.mark.parametrize('bbox_case', BOUNDING_BOXES)
 def test_detected_bbox(bbox_case: BBoxTestCase) -> None:
-    """"""
+    """Test instantiation and properties of `DetectedBBox` class."""
     detected_bbox = DetectedBBox(*bbox_case.bbox)
     assert detected_bbox.width == bbox_case.width
     assert detected_bbox.height == bbox_case.height
@@ -29,7 +29,7 @@ def test_detected_bbox(bbox_case: BBoxTestCase) -> None:
 
 @pytest.mark.parametrize('bbox_case', BOUNDING_BOXES)
 def test_detected_bbox_from_x_y_w_h(bbox_case: BBoxTestCase) -> None:
-    """"""
+    """Test class method and properties of `DetectedBBox` class."""
     detected_bbox = DetectedBBox.from_x_y_w_h(*bbox_case.x_y_w_h)
     assert detected_bbox.width == bbox_case.width
     assert detected_bbox.height == bbox_case.height

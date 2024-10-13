@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from abc import ABC, abstractmethod
 import cv2
 from cv2.typing import MatLike
@@ -7,6 +8,7 @@ from typing import (
     Any,
     Dict,
     Optional,
+    Set,
     Tuple
 )
 
@@ -289,33 +291,68 @@ class MosaicRectBlur(AbstractBlur):
             `MatLike`: The ndarray representation of the image with the mosaic
                 blur applied.
         """
-        def create_block(block: int, size: int) -> Tuple[int, int]:
-            return (block - 1) * size, block * size
+        class TesseraeInfo:
+            def __init__(self, num: int, dim: int):
+                self.num = num
+                self.size = dim // num
+                self.blocks: Dict[int, Tuple[int, int]] = dict()
+
+                self._position = 0
+                self._overflow_indices: Set[int] = set()
+
+                size_overflow = dim - num * self.size
+                tessera_indices = list(range(num))
+
+                num_chosen = size_overflow
+                while num_chosen > 0:
+                    index = random.choice(tessera_indices)
+                    tessera_indices.remove(index)
+                    self._overflow_indices.add(index)
+
+                    num_chosen -= 1
+            
+            @property
+            def position(self) -> int:
+                return self._position
+
+            @property
+            def overflow_indices(self) -> Set[int]:
+                return self._overflow_indices
+            
+            def create_block(self, block_index: int) -> Tuple[int, int]:
+                if block_index in self.blocks:
+                    return self.blocks[block_index]
+                else:
+                    start = self._position
+                    self._position += self.size
+
+                    if block_index in self.overflow_indices:
+                        self._position += 1
+
+                    block = (start, self.position)
+                    self.blocks.update({block_index: block})
+
+                    return block
 
         # Retrieve image dimensions
         shape = image.shape[:2]
         h, w = shape
 
-        # Calculate the height and width of a tessera
-        y_size = h // self.num_y_tesserae
-        x_size = w // self.num_x_tesserae
+        # Calculate tessera information for x and y
+        y_tesserae = TesseraeInfo(num=self.num_y_tesserae, dim=h)
+        x_tesserae = TesseraeInfo(num=self.num_x_tesserae, dim=w)
 
-        # Generate all tesserae sections (start and end coordinates)
-        blocks = []
-        for y_block in range(1, self.num_y_tesserae + 1):
-            for x_block in range(1, self.num_x_tesserae + 1):
+        # Generate all tesserae sections and apply blur
+        for y_block in range(y_tesserae.num):
+            for x_block in range(x_tesserae.num):
 
                 # Calcuate the start and end coordinates in both the
                 # y and x directions
-                y_start, y_end = create_block(block=y_block, size=y_size)
-                x_start, x_end = create_block(block=x_block, size=x_size)
+                y_start, y_end = y_tesserae.create_block(block_index=y_block)
+                x_start, x_end = x_tesserae.create_block(block_index=x_block)
 
-                block = (y_start, x_start, y_end, x_end)
-                blocks.append(block)
-
-        # Iterate through each pre-computed tesserae and apply the blur
-        for (y_start, x_start, y_end, x_end) in blocks:
-            tessera_view = image[y_start: y_end, x_start: x_end]
-            tessera_view[:, :] = self._blur_method.apply_blur(image=tessera_view)
+                # Iterate through each pre-computed tesserae and apply the blur
+                tessera_view = image[y_start: y_end, x_start: x_end]
+                tessera_view[:, :] = self._blur_method.apply_blur(image=tessera_view)
 
         return image
