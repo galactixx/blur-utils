@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import random
+import math
 from abc import ABC, abstractmethod
 import cv2
 from cv2.typing import MatLike
@@ -24,6 +24,8 @@ from face_blur_utils._settings import (
     MedianBlurSettings,
     MotionBlurSettings
 )
+
+_STEP_SIZE_PCT = 0.15
 
 class AbstractBlur(ABC):
     """
@@ -301,15 +303,21 @@ class MosaicRectBlur(AbstractBlur):
                 self._overflow_indices: Set[int] = set()
 
                 size_overflow = dim - num * self.size
-                tessera_indices = list(range(num))
+                tessera_indices = set(range(self.num))
 
-                num_chosen = size_overflow
-                while num_chosen > 0:
-                    index = random.choice(tessera_indices)
-                    tessera_indices.remove(index)
+                # Determine the step-size
+                step_size = self._determine_step_size()
+
+                num_chosen = 0
+                while num_chosen != size_overflow:
+                    # Apply golden ratio for evenly distributed allocation
+                    index = (num_chosen * step_size) % self.num
+
+                    # Adjust the collections of tessera indices
                     self._overflow_indices.add(index)
+                    tessera_indices.remove(index)
 
-                    num_chosen -= 1
+                    num_chosen += 1
             
             @property
             def position(self) -> int:
@@ -319,6 +327,15 @@ class MosaicRectBlur(AbstractBlur):
             def overflow_indices(self) -> Set[int]:
                 return self._overflow_indices
             
+            def _determine_step_size(self) -> int:
+                step_gcd = -1
+                step_size = round(_STEP_SIZE_PCT * self.num) - 1
+                while step_gcd != 1:
+                    step_size += 1
+                    step_gcd = math.gcd(self.num, step_size)
+
+                return step_size
+
             def create_block(self, block_index: int) -> Tuple[int, int]:
                 if block_index in self.blocks:
                     return self.blocks[block_index]
@@ -344,11 +361,11 @@ class MosaicRectBlur(AbstractBlur):
 
         # Generate all tesserae sections and apply blur
         for y_block in range(y_tesserae.num):
+            y_start, y_end = y_tesserae.create_block(block_index=y_block)
+
             for x_block in range(x_tesserae.num):
 
-                # Calcuate the start and end coordinates in both the
-                # y and x directions
-                y_start, y_end = y_tesserae.create_block(block_index=y_block)
+                # Calcuate the start and end coordinates in the x direction
                 x_start, x_end = x_tesserae.create_block(block_index=x_block)
 
                 # Iterate through each pre-computed tesserae and apply the blur

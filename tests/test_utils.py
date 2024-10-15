@@ -9,11 +9,11 @@ from face_blur_utils import (
 EXAMPLES_PATH = './tests/examples/'
 
 # Valid photo file names
-ELON_MUSK_PHOTO = 'elon.jpg'
-MARK_Z_PHOTO = 'marky_z.jpg'
+ELON_MUSK_PHOTO = 'elon.png'
+MARK_Z_PHOTO = 'marky_z.png'
 
 # Invalid photo file names
-NOT_A_PHOTO = 'not_a_photo.jpg'
+NOT_A_PHOTO = 'not_a_photo.png'
 
 # Valid video file name
 STOCK_VIDEO = 'video.mp4'
