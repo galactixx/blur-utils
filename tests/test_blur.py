@@ -11,6 +11,8 @@ from blur_utils import (
     GaussianBlur,
     GaussianBlurSettings,
     load_image,
+    MedianBlur,
+    MedianBlurSettings,
     MosaicRectBlur
 )
 
@@ -53,6 +55,10 @@ MARK_Z_GAUSSIAN_PHOTO = 'marky_z_gaussian.png'
 ELON_MUSK_AVG_PHOTO = 'elon_average.png'
 MARK_Z_AVG_PHOTO = 'marky_z_average.png'
 
+# Median blur photo file names
+ELON_MUSK_MEDIAN_PHOTO = 'elon_median.png'
+MARK_Z_MEDIAN_PHOTO = 'marky_z_median.png'
+
 MOSAIC_CASES: TestCases = [
     BlurTestCase(input_image=ELON_MUSK_PHOTO, output_image=ELON_MUSK_MOSAIC_PHOTO),
     BlurTestCase(input_image=MARK_Z_PHOTO, output_image=MARK_Z_MOSAIC_PHOTO)
@@ -66,6 +72,11 @@ GAUSSIAN_CASES: TestCases = [
 AVERAGE_CASES: TestCases = [
     BlurTestCase(input_image=ELON_MUSK_PHOTO, output_image=ELON_MUSK_AVG_PHOTO),
     BlurTestCase(input_image=MARK_Z_PHOTO, output_image=MARK_Z_AVG_PHOTO)
+]
+
+MEDIAN_CASES: TestCases = [
+    BlurTestCase(input_image=ELON_MUSK_PHOTO, output_image=ELON_MUSK_MEDIAN_PHOTO),
+    BlurTestCase(input_image=MARK_Z_PHOTO, output_image=MARK_Z_MEDIAN_PHOTO)
 ]
 
 def __apply_blur_and_compare(blur: AbstractBlur, case: BlurTestCase) -> None:
@@ -117,3 +128,14 @@ def test_average_blur(average_case: BlurTestCase) -> None:
         image=input_image, settings=AverageBlurSettings(kernel=(5, 5))
     )
     __apply_blur_and_compare(blur=average_blur, case=average_case)
+
+
+@pytest.mark.parametrize('median_case', MEDIAN_CASES)
+def test_average_blur(median_case: BlurTestCase) -> None:
+    """Test that the median blur is performing as expected."""
+    input_image = load_image(image_file=median_case.input_path)
+
+    median_blur = MedianBlur(
+        image=input_image, settings=MedianBlurSettings(kernel=7)
+    )
+    __apply_blur_and_compare(blur=median_blur, case=median_case)

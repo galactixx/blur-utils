@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from abc import ABC, abstractmethod
 import cv2
 from cv2.typing import MatLike
@@ -8,12 +7,9 @@ from typing import (
     Any,
     Dict,
     Optional,
-    overload,
-    Set,
-    Tuple
+    overload
 )
 
-import numpy as np
 from pydantic import BaseModel
 
 from blur_utils._exceptions import InvalidSettingsError
@@ -26,8 +22,6 @@ from blur_utils._settings import (
     MedianBlurSettings,
     MotionBlurSettings
 )
-
-_STEP_SIZE_PCT = 0.15
 
 @overload
 def get_blur(image: MatLike, settings: AverageBlurSettings) -> AverageBlur:
@@ -285,46 +279,13 @@ class MosaicRectBlur(AbstractBlur):
         image (`MatLike`): A `MatLike` instance, an ndarray representation of the image.
         num_x_tesserae (int): The number of tesserae on the x-axis.
         num_y_tesserae (int): The number of tesserae on the y-axis.
-        image (`BlurSetting` | None): The settings for the type of blur to apply to each
-            tesserae. Can select from an average blur, gaussian blur, or median blur. If
-            None is selected, then defaults to a pixelation blur. Defaults to None.
     """
     def __init__(
-        self,
-        image: MatLike, 
-        num_x_tesserae: int,
-        num_y_tesserae: int,
-        blur_method: Optional[BlurSetting] = None
+        self, image: MatLike, num_x_tesserae: int, num_y_tesserae: int
     ):
         super().__init__(image=image)
         self.num_x_tesserae = num_x_tesserae
         self.num_y_tesserae = num_y_tesserae
-
-        # Select blur method to apply to each tessera
-        self._blur_method = self._select_blur_method(blur_method=blur_method)
-
-    def _select_blur_method(self, blur_method: Optional[BlurSetting]) -> AbstractBlur:
-        """A private method to select the blur method to use within tessera."""
-        class Pixelation(AbstractBlur):
-            """"""
-            def __init__(self, image: MatLike):
-                super().__init__(image=image)
-            
-            def apply_blur(self, image: MatLike) -> MatLike:
-                return np.mean(image, axis=(0, 1))
-        
-        # Based on the blur settings passed, determine which blur to select. The blur
-        # will be applied to each tessera.
-        
-        # If no blur settings was specified, then the default is to use a pixelation
-        # blur, which simply takes the average of the R, G, B channels
-        blur: AbstractBlur
-        if blur_method is None:
-            blur = Pixelation(image=self.image)
-        else:
-            blur = get_blur(image=self.image, settings=blur_method)
-
-        return blur
 
     def apply_blur(self, image: MatLike) -> MatLike:
         """
@@ -338,86 +299,25 @@ class MosaicRectBlur(AbstractBlur):
             `MatLike`: The ndarray representation of the image with the mosaic
                 blur applied.
         """
-        class TesseraeInfo:
-            def __init__(self, num: int, dim: int):
-                self.num = num
-                self.size = dim // num
-                self.blocks: Dict[int, Tuple[int, int]] = dict()
-
-                self._position = 0
-                self._overflow_indices: Set[int] = set()
-
-                size_overflow = dim - num * self.size
-                tessera_indices = set(range(self.num))
-
-                # Determine the step-size
-                step_size = self._determine_step_size()
-
-                num_chosen = 0
-                while num_chosen != size_overflow:
-                    # Apply modulo step-size for evenly distributed allocation
-                    index = (num_chosen * step_size) % self.num
-
-                    # Adjust the collections of tessera indices
-                    self._overflow_indices.add(index)
-                    tessera_indices.remove(index)
-
-                    num_chosen += 1
-            
-            @property
-            def position(self) -> int:
-                return self._position
-
-            @property
-            def overflow_indices(self) -> Set[int]:
-                return self._overflow_indices
-            
-            def _determine_step_size(self) -> int:
-                step_gcd = -1
-                step_size = round(_STEP_SIZE_PCT * self.num) - 1
-                while step_gcd != 1:
-                    step_size += 1
-                    step_gcd = math.gcd(self.num, step_size)
-
-                return step_size
-
-            def create_block(self, block_index: int) -> Tuple[int, int]:
-                if block_index in self.blocks:
-                    return self.blocks[block_index]
-                else:
-                    start = self._position
-                    self._position += self.size
-
-                    if block_index in self.overflow_indices:
-                        self._position += 1
-
-                    block = (start, self.position)
-                    self.blocks.update({block_index: block})
-
-                    return block
-
         # Retrieve image dimensions
         shape = image.shape[:2]
         h, w = shape
 
-        # Calculate tessera information for x and y
-        y_tesserae = TesseraeInfo(num=self.num_y_tesserae, dim=h)
-        x_tesserae = TesseraeInfo(num=self.num_x_tesserae, dim=w)
+        # Resize the image down to the tessera grid size
+        small_image = cv2.resize(
+            image,
+            (self.num_x_tesserae, self.num_y_tesserae),
+            interpolation=cv2.INTER_AREA
+        )
 
-        # Generate all tesserae sections and apply blur
-        for y_block in range(y_tesserae.num):
-            y_start, y_end = y_tesserae.create_block(block_index=y_block)
+        # Resize the small image back to the original size
+        mosaic_image = cv2.resize(
+            small_image,
+            (w, h),
+            interpolation=cv2.INTER_NEAREST
+        )
 
-            for x_block in range(x_tesserae.num):
-
-                # Calcuate the start and end coordinates in the x direction
-                x_start, x_end = x_tesserae.create_block(block_index=x_block)
-
-                # Iterate through each pre-computed tesserae and apply the blur
-                tessera_view = image[y_start: y_end, x_start: x_end]
-                tessera_view[:, :] = self._blur_method.apply_blur(image=tessera_view)
-
-        return image
+        return mosaic_image
 
 
 BLUR_MAPPING = {
