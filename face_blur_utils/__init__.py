@@ -3,6 +3,7 @@ from face_blur_utils._blur import (
     BilateralFilter,
     BoxFilter,
     GaussianBlur,
+    get_blur,
     MedianBlur,
     MosaicRectBlur,
     MotionBlur
@@ -36,6 +37,7 @@ __all__ = [
     'BilateralFilter',
     'BoxFilter',
     'GaussianBlur',
+    'get_blur',
     'MedianBlur',
     'MosaicRectBlur',
     'MotionBlur',

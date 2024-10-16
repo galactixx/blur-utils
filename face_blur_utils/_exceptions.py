@@ -20,3 +20,9 @@ class ImageReadError(BaseError):
     """Error occurs when loading an image file into a MatLike instance."""
     def __init__(self, message: str):
         super().__init__(message=message)
+
+
+class InvalidSettingsError(BaseError):
+    """Error occurs when accessing blur settings that have not been loaded."""
+    def __init__(self, message: str):
+        super().__init__(message=message)

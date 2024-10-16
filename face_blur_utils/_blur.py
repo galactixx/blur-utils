@@ -8,6 +8,7 @@ from typing import (
     Any,
     Dict,
     Optional,
+    overload,
     Set,
     Tuple
 )
@@ -15,6 +16,7 @@ from typing import (
 import numpy as np
 from pydantic import BaseModel
 
+from face_blur_utils._exceptions import InvalidSettingsError
 from face_blur_utils._typing import BlurSetting, DetectedBBox
 from face_blur_utils._settings import (
     AverageBlurSettings,
@@ -26,6 +28,47 @@ from face_blur_utils._settings import (
 )
 
 _STEP_SIZE_PCT = 0.15
+
+@overload
+def get_blur(image: MatLike, settings: AverageBlurSettings) -> AverageBlur:
+    ...
+
+
+@overload
+def get_blur(image: MatLike, settings: BilateralFilterSettings) -> BilateralFilter:
+    ...
+
+
+@overload
+def get_blur(image: MatLike, settings: BoxFilterSettings) -> BoxFilter:
+    ...
+
+
+@overload
+def get_blur(image: MatLike, settings: GaussianBlurSettings) -> GaussianBlur:
+    ...
+
+
+@overload
+def get_blur(image: MatLike, settings: MedianBlurSettings) -> MedianBlur:
+    ...
+
+
+@overload
+def get_blur(image: MatLike, settings: MotionBlurSettings) -> MotionBlur:
+    ...
+
+
+def get_blur(image: MatLike, settings: BlurSetting) -> AbstractBlur:
+    """"""
+    settings_type = type(settings)
+    blur = BLUR_MAPPING.get(settings_type, None)
+
+    if blur is None:
+        raise ValueError(f'Unknown blur settings')
+    
+    return blur(image=image, settings=settings)
+
 
 class AbstractBlur(ABC):
     """
@@ -48,7 +91,15 @@ class AbstractBlur(ABC):
     @property
     def settings(self) -> Dict[str, Any]:
         """Returns the current settings being used for each blur."""
+        if self._settings is None:
+            raise InvalidSettingsError('Settings for blur has not been loaded')
+        
         return self._settings.model_dump(by_alias=True)
+
+    @settings.setter
+    def settings(self, settings: BaseModel) -> None:
+        """Setter for the blur settings."""
+        self._settings = settings
 
     def apply_blur_to_face(self, bbox: DetectedBBox) -> None:
         """
@@ -268,17 +319,11 @@ class MosaicRectBlur(AbstractBlur):
         # If no blur settings was specified, then the default is to use a pixelation
         # blur, which simply takes the average of the R, G, B channels
         blur: AbstractBlur
-        match blur_method:
-            case AverageBlurSettings():
-                blur = AverageBlur(image=self.image, settings=blur_method)
-            case MedianBlurSettings():
-                blur = MedianBlur(image=self.image, settings=blur_method)
-            case GaussianBlurSettings():
-                blur = GaussianBlur(image=self.image, settings=blur_method)
-            case None:
-                blur = Pixelation(image=self.image)
-            case _:
-                raise ValueError(f'Unknown blur settings')
+        if blur_method is None:
+            blur = Pixelation(image=self.image)
+        else:
+            blur = get_blur(image=self.image, settings=blur_method)
+
         return blur
 
     def apply_blur(self, image: MatLike) -> MatLike:
@@ -310,7 +355,7 @@ class MosaicRectBlur(AbstractBlur):
 
                 num_chosen = 0
                 while num_chosen != size_overflow:
-                    # Apply golden ratio for evenly distributed allocation
+                    # Apply modulo step-size for evenly distributed allocation
                     index = (num_chosen * step_size) % self.num
 
                     # Adjust the collections of tessera indices
@@ -373,3 +418,13 @@ class MosaicRectBlur(AbstractBlur):
                 tessera_view[:, :] = self._blur_method.apply_blur(image=tessera_view)
 
         return image
+
+
+BLUR_MAPPING = {
+    AverageBlurSettings: AverageBlur,
+    BilateralFilterSettings: BilateralFilter,
+    BoxFilterSettings: BoxFilter,
+    GaussianBlurSettings: GaussianBlur,
+    MedianBlurSettings: MedianBlur,
+    MotionBlurSettings: MotionBlur
+}

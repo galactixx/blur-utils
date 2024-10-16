@@ -34,7 +34,7 @@ class GaussianBlurSettings(BaseModel):
         border_type (int): Specifies the border handling.
     """
     kernel: Tuple[int, int] = Field(..., serialization_alias='ksize')
-    sigma_x: float = Field(default=0, serialization_alias='simgaX')
+    sigma_x: float = Field(default=0, serialization_alias='sigmaX')
     sigma_y: float = Field(default=0, serialization_alias='sigmaY')
     border_type: int = Field(
         default=cv2.BORDER_DEFAULT, serialization_alias='borderType'
@@ -107,7 +107,7 @@ class MotionBlurSettings(BaseModel):
         cls, direction: Literal['vertical', 'horizontal'], n: int
     ) -> MotionBlurSettings:
         """
-        Create a MotionBlurSettings instance with a motion blur kernel
+        Create a `MotionBlurSettings` instance with a motion blur kernel
         based on the direction.
 
         Args:
@@ -115,7 +115,7 @@ class MotionBlurSettings(BaseModel):
             n (int): Size of the kernel.
 
         Returns:
-            MotionBlurSettings: A settings object with the generated kernel.
+            `MotionBlurSettings`: A settings object with the generated kernel.
         """
         kernel: NDArray[Any]
         if direction == 'horizontal':

@@ -17,8 +17,11 @@ from PIL import Image
 from face_blur_utils._utils import load_video
 from face_blur_utils._settings import (
     AverageBlurSettings,
+    BilateralFilterSettings,
+    BoxFilterSettings,
     GaussianBlurSettings,
-    MedianBlurSettings
+    MedianBlurSettings,
+    MotionBlurSettings
 )
 
 VideoFile: TypeAlias = Union[
@@ -37,8 +40,11 @@ ImageFile: TypeAlias = Union[
 
 BlurSetting: TypeAlias = Union[
     AverageBlurSettings,
+    BilateralFilterSettings,
+    BoxFilterSettings,
     GaussianBlurSettings,
-    MedianBlurSettings
+    MedianBlurSettings,
+    MotionBlurSettings
 ]
 
 @dataclass
