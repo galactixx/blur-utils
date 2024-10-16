@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "face-blur-utils"
+name = "blur-utils"
 version = "0.1.0"
-description = "Tiny package containing helpful classes and functions when blurring faces"
+description = "Tiny package containing helpful classes and functions when blurring images"
 authors = ["galactixx"]
 license = "MIT License"
 readme = "README.md"
@@ -9,8 +9,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 numpy = "^2.1.1"
-pydantic = "^2.9.2"
+pydantic = "^2.7.1"
 pillow = "^10.4.0"
+opencv-python = "^4.10.0.84"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -18,14 +19,3 @@ pytest = "^8.3.3"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.mypy]
-allow_redefinition = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_decorators = false
-disallow_untyped_defs = true
-no_implicit_optional = true
-show_error_codes = true
-strict_equality = true
-warn_unused_ignores = true
