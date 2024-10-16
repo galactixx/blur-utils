@@ -14,8 +14,8 @@ from typing import (
 from numpy.typing import NDArray
 from PIL import Image
 
-from face_blur_utils._utils import load_video
-from face_blur_utils._settings import (
+from blur_utils._utils import load_video
+from blur_utils._settings import (
     AverageBlurSettings,
     BilateralFilterSettings,
     BoxFilterSettings,

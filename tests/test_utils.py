@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from face_blur_utils import (
+from blur_utils import (
     load_image, 
     load_video
 )

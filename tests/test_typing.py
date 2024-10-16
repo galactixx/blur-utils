@@ -2,7 +2,7 @@ from typing import List, Tuple
 from dataclasses import dataclass
 
 import pytest
-from face_blur_utils import DetectedBBox
+from blur_utils import DetectedBBox
 
 @dataclass(frozen=True)
 class BBoxTestCase:

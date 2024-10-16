@@ -4,7 +4,7 @@ from typing import List, TypeAlias
 
 import numpy as np
 import pytest
-from face_blur_utils import (
+from blur_utils import (
     AverageBlur,
     AverageBlurSettings,
     DetectedBBox,
@@ -14,7 +14,7 @@ from face_blur_utils import (
     MosaicRectBlur
 )
 
-from face_blur_utils._blur import AbstractBlur
+from blur_utils._blur import AbstractBlur
 
 @dataclass
 class BlurTestCase:

@@ -16,9 +16,9 @@ from typing import (
 import numpy as np
 from pydantic import BaseModel
 
-from face_blur_utils._exceptions import InvalidSettingsError
-from face_blur_utils._typing import BlurSetting, DetectedBBox
-from face_blur_utils._settings import (
+from blur_utils._exceptions import InvalidSettingsError
+from blur_utils._typing import BlurSetting, DetectedBBox
+from blur_utils._settings import (
     AverageBlurSettings,
     BilateralFilterSettings,
     BoxFilterSettings,

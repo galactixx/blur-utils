@@ -11,13 +11,13 @@ import numpy as np
 from numpy.typing import NDArray
 from PIL import Image
 
-from face_blur_utils._exceptions import (
+from blur_utils._exceptions import (
     ImageReadError,
     VideoCaptureError
 )
 
 if TYPE_CHECKING:
-    from face_blur_utils._typing import ImageFile, VideoFile
+    from blur_utils._typing import ImageFile, VideoFile
 
 def _validate_media_file_path(media_path: Union[str, Path]) -> Path:
     """Private generic function to validate file path of image or video."""

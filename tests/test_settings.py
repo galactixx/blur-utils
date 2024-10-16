@@ -8,7 +8,7 @@ from typing import (
 import numpy as np
 from numpy.typing import NDArray
 import pytest
-from face_blur_utils import MotionBlurSettings
+from blur_utils import MotionBlurSettings
 
 @dataclass
 class MotionBlurTestCase:

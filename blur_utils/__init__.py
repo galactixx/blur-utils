@@ -1,4 +1,4 @@
-from face_blur_utils._blur import (
+from blur_utils._blur import (
     AverageBlur,
     BilateralFilter,
     BoxFilter,
@@ -8,7 +8,7 @@ from face_blur_utils._blur import (
     MosaicRectBlur,
     MotionBlur
 )
-from face_blur_utils._settings import (
+from blur_utils._settings import (
     AverageBlurSettings,
     GaussianBlurSettings,
     MedianBlurSettings,
@@ -16,20 +16,20 @@ from face_blur_utils._settings import (
     BoxFilterSettings,
     MotionBlurSettings
 )
-from face_blur_utils._utils import (
+from blur_utils._utils import (
     convert_BGR,
     convert_RGB,
     load_image,
     load_video
 )
-from face_blur_utils._typing import (
+from blur_utils._typing import (
     BlurSetting,
     DetectedBBox,
     ImageFile,
     VideoFile,
     VideoOutput
 )
-from face_blur_utils._exceptions import VideoCaptureError
+from blur_utils._exceptions import VideoCaptureError
 
 __version__ = '0.1.0'
 __all__ = [
