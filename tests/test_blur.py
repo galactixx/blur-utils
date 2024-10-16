@@ -1,22 +1,41 @@
 from dataclasses import dataclass
 import os
-from typing import List, TypeAlias
+from typing import (
+    List,
+    Type,
+    TypeAlias
+)
 
+from pydantic import BaseModel
 import numpy as np
 import pytest
 from blur_utils import (
     AverageBlur,
     AverageBlurSettings,
+    BilateralFilter,
+    BilateralFilterSettings,
+    BoxFilterSettings,
+    BoxFilter,
     DetectedBBox,
     GaussianBlur,
     GaussianBlurSettings,
+    get_blur,
     load_image,
     MedianBlur,
     MedianBlurSettings,
-    MosaicRectBlur
+    MosaicRectBlur,
+    MotionBlur,
+    MotionBlurSettings
 )
 
 from blur_utils._blur import AbstractBlur
+
+@dataclass
+class SettingsTestCase:
+    """"""
+    settings: BaseModel
+    blur: Type[AbstractBlur]
+
 
 @dataclass
 class BlurTestCase:
@@ -79,6 +98,21 @@ MEDIAN_CASES: TestCases = [
     BlurTestCase(input_image=MARK_Z_PHOTO, output_image=MARK_Z_MEDIAN_PHOTO)
 ]
 
+SETTINGS: List[SettingsTestCase] = [
+    SettingsTestCase(settings=AverageBlurSettings(kernel=(5, 5)), blur=AverageBlur),
+    SettingsTestCase(
+        settings=BilateralFilterSettings(diameter=9, sigma_color=75, sigma_space=75),
+        blur=BilateralFilter
+    ),
+    SettingsTestCase(settings=BoxFilterSettings(kernel=(5, 5)), blur=BoxFilter),
+    SettingsTestCase(settings=GaussianBlurSettings(kernel=(5, 5)), blur=GaussianBlur),
+    SettingsTestCase(settings=MedianBlurSettings(kernel=5), blur=MedianBlur),
+    SettingsTestCase(
+        settings=MotionBlurSettings.from_motion_direction(direction='horizontal', n=5),
+        blur=MotionBlur
+    )
+]
+
 def __apply_blur_and_compare(blur: AbstractBlur, case: BlurTestCase) -> None:
     """
     Private function to run the core of blur tests, and ensure that the
@@ -95,6 +129,14 @@ def __apply_blur_and_compare(blur: AbstractBlur, case: BlurTestCase) -> None:
     output_image = load_image(image_file=case.output_path)
 
     assert np.array_equal(output_image, blur.image)
+
+
+@pytest.mark.parametrize('settings_case', SETTINGS)
+def test_get_blur(settings_case: SettingsTestCase) -> None:
+    """"""
+    image = load_image(image_file=os.path.join(EXAMPLES_PATH, ELON_MUSK_PHOTO))
+    blur = get_blur(image=image, settings=settings_case.settings)
+    assert type(blur) == settings_case.blur
 
 
 @pytest.mark.parametrize('mosaic_case', MOSAIC_CASES)
