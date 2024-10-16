@@ -1,12 +1,10 @@
 from dataclasses import dataclass
 from typing import (
-    Any,
     List,
     Literal
 )
 
 import numpy as np
-from numpy.typing import NDArray
 import pytest
 from blur_utils import MotionBlurSettings
 
@@ -15,7 +13,7 @@ class MotionBlurTestCase:
     """Used in testing the `MotionBlurSettings` class."""
     direction: Literal['vertical', 'horizontal']
     n: int
-    kernel: NDArray[Any]
+    kernel: np.ndarray
     depth: int = -1
 
 MOTION_BLUR_CASES: List[MotionBlurTestCase] = [

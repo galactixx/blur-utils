@@ -2,16 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 import cv2
-from cv2.typing import MatLike
 from dataclasses import dataclass
 from typing import (
-    Any,
     Tuple,
     TypeAlias,
     Union
 )
 
-from numpy.typing import NDArray
+import numpy as np
 from PIL import Image
 
 from blur_utils._utils import load_video
@@ -33,9 +31,8 @@ VideoFile: TypeAlias = Union[
 ImageFile: TypeAlias = Union[
     str,
     Path,
-    MatLike,
-    Image.Image,
-    NDArray[Any]
+    np.ndarray,
+    Image.Image
 ]
 
 BlurSetting: TypeAlias = Union[

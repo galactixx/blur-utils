@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import cv2
-from typing import Any, Literal, Tuple
+from typing import Literal, Tuple
 
 import numpy as np
-from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
 class AverageBlurSettings(BaseModel):
@@ -94,10 +93,10 @@ class MotionBlurSettings(BaseModel):
     Configuration for motion blur in OpenCV.
 
     Attributes:
-        kernel (NDArray[Any]): Kernel to be applied for the motion blur.
+        kernel (`np.ndarray`): Kernel to be applied for the motion blur.
         depth (int): Desired depth of the output image.
     """
-    kernel: NDArray[Any] = Field(..., serialization_alias='kernel')
+    kernel: np.ndarray = Field(..., serialization_alias='kernel')
     depth: int = Field(default=-1, serialization_alias='ddepth')
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -117,7 +116,7 @@ class MotionBlurSettings(BaseModel):
         Returns:
             `MotionBlurSettings`: A settings object with the generated kernel.
         """
-        kernel: NDArray[Any]
+        kernel: np.ndarray
         if direction == 'horizontal':
             kernel = np.ones((1, n)) / n
         elif direction == 'vertical':
